@@ -1,6 +1,7 @@
 package gameElements;
 
 import java.util.ArrayList;
+import java.util.NoSuchElementException;
 
 
 public class Board {
@@ -9,14 +10,14 @@ public class Board {
 	protected int numberOfPieces;
 	protected Square[][] board;
 	
-	public Board(Game game, int Size){
+	public Board(Game game, int size){
 		this.game = game;
 		this.size = size;
 		this.numberOfPieces = 0;
-		
+		board = new Square[size][size];
 		for (int i = 0; i < size; i++){
 			for (int j = 0; j < size; j++){
-				this.board[i][j] = new Empty();
+				this.board[i][j] = game.getEmpty();
 			}
 		}
 		
@@ -92,7 +93,7 @@ public class Board {
 	}
 	
 	public Board clone(){
-		Board res = new Board();
+		Board res = new Board(new Game(), this.size);
 		res.size = this.getSize();
 		for (int i = 0; i < this.size; i++){
 			for (int j = 0; j < this.size; j++){
@@ -233,10 +234,62 @@ public class Board {
 	
 	//----------TP2-----------------------
 	public ArrayList<Board> depthFirstSearch(Board b) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Board> sol = new ArrayList<Board>();
+		if(b.isSolution()){
+			sol.add(b);
+			return sol;
+		}
+		ArrayList<Board> suc = b.getSuccessors();
+		for(Board bo : suc){
+			try{
+				sol = depthFirstSearch(bo);
+				sol.add(b);
+				return sol;
+			}catch (NoSuchElementException e){
+				//System.out.println("Echec");
+			}
+		}
+		throw new NoSuchElementException();
 	}
 	
+	public ArrayList<Board> depthFirstSearch(){
+		ArrayList<Board> sol = new ArrayList<Board>();
+		Board b = new Board();
+		try{
+			sol = depthFirstSearch(b);
+			return sol;
+		}catch (NoSuchElementException e){
+			//System.out.println("Echec");
+		}
+		throw new NoSuchElementException();
+	}
+	
+	public boolean isSolution(){
+		return this.size == this.numberOfPieces;
+	}
+	
+	public ArrayList<Board> getSuccessors(){
+		ArrayList<Board> listeSucc = new ArrayList<Board>();
+		for(int ligne = 0; ligne < this.size; ligne ++){
+			for(int col = 0; col < this.size; col ++){
+				Board b = this.clone();
+				if(b.placeQueen(col, ligne)){
+					listeSucc.add(b);
+				}
+			}
+		}
+		return listeSucc;
+	}
+	
+	public String solutionSteps(Board b){
+		ArrayList<Board> temp = depthFirstSearch(b);
+		StringBuilder sB = new StringBuilder();
+		for(int i = temp.size()-1; i >= 0; i--){
+			sB.append(temp.get(i).toString());
+			sB.append("\n");
+		}
+		return sB.toString();
+	}
 	
 	//------------TP3----------------------
 	public boolean isAccessible2(int i, int j, Player currentPlayer) {

@@ -1,6 +1,10 @@
+import java.util.ArrayList;
+import java.util.Date;
+
 import javax.swing.JOptionPane;
 
 import gameElements.Board;
+import gameElements.Game;
 import gameElements.Player;
 import gameElements.Queen;
 import gameElements.Rock;
@@ -11,13 +15,18 @@ public class Main {
 	public static void main(String[] args) {
 		
 		//test1();
-		test2();
+		//test2();
+		//test3();
+		test4();
 		
-		Board b = new Board();
-		b.setPiece(5, 5, new Queen(b.getGame().getPlayer0()));
-
+		//testGUI();
+		
+	}
+	
+	private static void testGUI(){
+		Board b = new Board(new Game(), 15);
 		GameUI gui = new GameUI(b);		
-		//gui.launch();
+		gui.launch();
 	}
 	
 	private static void test1(){
@@ -75,5 +84,24 @@ public class Main {
 				}
 			}
 		}
+	}
+	
+	private static void test3(){
+		Board b = new Board();
+		System.out.println("Test 3 - Successeurs");
+		b.placeQueen(4, 5);
+		ArrayList<Board> toast = b.getSuccessors();
+	}
+	
+	private static void test4(){
+		Board b = new Board(new Game(), 9);
+		System.out.println("Test 4 - Recherche profondeur + temps éxécution");
+		double debut = System.currentTimeMillis();
+	
+		//System.out.println(b.solutionSteps(b));
+		b.solutionSteps(b);
+		
+		double fin = (System.currentTimeMillis() - debut)/1000;
+		System.out.println("Temps éxécution de depthFirstSearch : "+fin+"s");
 	}
 }
