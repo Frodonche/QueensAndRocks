@@ -17,7 +17,12 @@ public class Main {
 		//test1();
 		//test2();
 		//test3();
-		test4();
+		//test4();
+		//test5();
+		//test6();
+		//test7();
+		//test8();
+		test9();
 		
 		//testGUI();
 		
@@ -91,17 +96,93 @@ public class Main {
 		System.out.println("Test 3 - Successeurs");
 		b.placeQueen(4, 5);
 		ArrayList<Board> toast = b.getSuccessors();
+		for(Board succ : toast){
+			System.out.println(succ.toString()+"\n");
+		}
 	}
 	
 	private static void test4(){
 		Board b = new Board(new Game(), 9);
-		System.out.println("Test 4 - Recherche profondeur + temps éxécution");
+		System.out.println("Test 4 - Recherche profondeur + temps execution");
 		double debut = System.currentTimeMillis();
 	
 		//System.out.println(b.solutionSteps(b));
 		b.solutionSteps(b);
 		
 		double fin = (System.currentTimeMillis() - debut)/1000;
-		System.out.println("Temps éxécution de depthFirstSearch : "+fin+"s");
+		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
+	}
+	
+	private static void test5(){
+		Board b = new Board();
+		System.out.println("Test 5 - Successeurs avec getNewSuccessors()");
+		b.placeQueen(4, 5);
+		ArrayList<Board> toast = b.getNewSuccessors();
+		for(Board succ : toast){
+			System.out.println(succ.toString()+"\n");
+		}
+	}
+	
+	private static void test6(){
+		Board b = new Board(new Game(), 9);
+		System.out.println("Test 6 - Recherche profondeur2 + temps execution");
+		double debut = System.currentTimeMillis();
+	
+		//System.out.println(b.solutionSteps(b));
+		b.solutionSteps(b);
+		
+		double fin = (System.currentTimeMillis() - debut)/1000;
+		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
+	}
+	
+	private static void test7(){
+		Board b = new Board(new Game(), 9);
+		System.out.println("Test 7 - boardToArray + arrayToBoard");
+		b.placeQueen(4, 5);
+		b.placeQueen(1, 3);
+		
+		ArrayList<Integer> tab = b.boardToArray();
+		System.out.println(tab.toString()+"\n");
+		
+		Board b2 = b.arrayToBoard(tab);
+		System.out.println("Original");
+		System.out.println(b.toString()+"\n");
+		
+		System.out.println("arrayToBoard()");
+		System.out.println(b2.toString()+"\n");
+	}
+	
+	private static void test8(){
+		Board b = new Board(new Game(), 4);
+		System.out.println("Test 8 - isSolutionArray");
+		b.placeQueen(0, 1);
+		b.placeQueen(1, 3);
+		b.placeQueen(2, 0);
+		b.placeQueen(3, 2);
+		ArrayList<Integer> tab = b.boardToArray();
+		System.out.println(tab.toString()+"\n");
+		System.out.println(b.toString()+"\n");
+		
+		Board toto = b.arrayToBoard(tab);
+		System.out.println(toto.toString());
+		if(b.isSolutionArray(tab))
+			System.out.println("Est solution");
+		else
+			System.out.println("N'est pas solution");
+	}
+	
+	private static void test9(){
+		ArrayList<Integer> tab = new ArrayList<Integer>();
+		tab.add(1); tab.add(3); tab.add(0); tab.add(2);
+		System.out.println(tab.toString());
+		
+		System.out.println("Test 9 - Recherche profondeurArray + temps execution");
+		double debut = System.currentTimeMillis();
+	
+		//System.out.println(b.solutionSteps(b));
+		b.solutionSteps(b);
+		
+		double fin = (System.currentTimeMillis() - debut)/1000;
+		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
 	}
 }

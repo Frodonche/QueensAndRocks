@@ -8,12 +8,14 @@ public class Board {
 	protected Game game;
 	protected int size;
 	protected int numberOfPieces;
+	protected int numberOfQueens;
 	protected Square[][] board;
 	
 	public Board(Game game, int size){
 		this.game = game;
 		this.size = size;
 		this.numberOfPieces = 0;
+		this.numberOfQueens = 0;
 		board = new Square[size][size];
 		for (int i = 0; i < size; i++){
 			for (int j = 0; j < size; j++){
@@ -62,30 +64,30 @@ public class Board {
 	}
 	
 	//---------------TP1------------------------
-	public Square getPiece(int i, int j) {
-		return this.board[i][j];
+	public Square getPiece(int col, int lig) {
+		return this.board[col][lig];
 	}
 	
-	public void setPiece(int i, int j, Square piece){
-		this.board[i][j] = piece;
+	public void setPiece(int col, int lig, Square piece){
+		this.board[col][lig] = piece;
 		this.numberOfPieces ++ ;
 	}
 	
-	public void removePiece(int i, int j){
-		this.board[i][j] = this.game.getEmpty();
+	public void removePiece(int col, int lig){
+		this.board[col][lig] = this.game.getEmpty();
 		this.numberOfPieces -- ;
 	}
 
-	public boolean isEmpty(int i, int j){
-		return this.board[i][j] == this.game.getEmpty();
+	public boolean isEmpty(int col, int lig){
+		return this.board[col][lig] == this.game.getEmpty();
 	}
 	
 	public String toString(){
 		StringBuilder res = new StringBuilder();
-		for (int i = 0; i < this.size; i++){
+		for (int lig = 0; lig < this.size; lig++){
 			res.append("| ");
-			for (int j = 0; j < this.size; j++){
-				res.append(getPiece(i, j).toString()+" ");
+			for (int col = 0; col < this.size; col++){
+				res.append(getPiece(col, lig).toString()+" ");
 			}
 			res.append("|\n");
 		}
@@ -212,7 +214,7 @@ public class Board {
 		return cpt;
 	}
 
-	public int numberOfQueens() {
+	/*public int numberOfQueens() {
 		int cpt = 0;
 		for(int i = 0; i < size; i++){
 			for(int j = 0; j < size; j++){
@@ -221,11 +223,16 @@ public class Board {
 			}
 		}
 		return cpt;
+	}*/
+	
+	public int numberOfQueens(){
+		return this.numberOfQueens;
 	}
 	
 	public boolean placeQueen(int i, int j) {
 		if(isAccessible(i, j)){
 			this.setPiece(i, j, new Queen(game.getPlayer0()));
+			this.numberOfQueens++;
 			return true;
 		}
 			
@@ -233,6 +240,7 @@ public class Board {
 	}
 	
 	//----------TP2-----------------------
+	
 	public ArrayList<Board> depthFirstSearch(Board b) {
 		ArrayList<Board> sol = new ArrayList<Board>();
 		if(b.isSolution()){
@@ -281,6 +289,17 @@ public class Board {
 		return listeSucc;
 	}
 	
+	public ArrayList<Board> getNewSuccessors(){
+		ArrayList<Board> listeSucc = new ArrayList<Board>();
+		for(int ligne = 0; ligne < this.size; ligne ++){
+			Board b = this.clone();
+			if(b.placeQueen(numberOfQueens(), ligne))
+				listeSucc.add(b);
+		}
+		
+		return listeSucc;
+	}
+	
 	public String solutionSteps(Board b){
 		ArrayList<Board> temp = depthFirstSearch(b);
 		StringBuilder sB = new StringBuilder();
@@ -289,6 +308,92 @@ public class Board {
 			sB.append("\n");
 		}
 		return sB.toString();
+	}
+	
+	public ArrayList<Board> depthFirstSearch2(Board b) {
+		ArrayList<Board> sol = new ArrayList<Board>();
+		if(b.isSolution()){
+			sol.add(b);
+			return sol;
+		}
+		ArrayList<Board> suc = b.getNewSuccessors();
+		for(Board bo : suc){
+			try{
+				sol = depthFirstSearch(bo);
+				sol.add(b);
+				return sol;
+			}catch (NoSuchElementException e){
+				//System.out.println("Echec");
+			}
+		}
+		throw new NoSuchElementException();
+	}
+	
+	public ArrayList<Board> depthFirstSearch2(){
+		ArrayList<Board> sol = new ArrayList<Board>();
+		Board b = new Board();
+		try{
+			sol = depthFirstSearch(b);
+			return sol;
+		}catch (NoSuchElementException e){
+			//System.out.println("Echec");
+		}
+		throw new NoSuchElementException();
+	}
+	
+	public ArrayList<Integer> boardToArray(){
+		ArrayList<Integer> res = new ArrayList<Integer>();
+		for(int col = 0; col < this.size; col++){
+			int temp = -1;
+			for(int lig = 0; lig < this.size; lig++){
+				if(board[col][lig] instanceof Queen)
+					temp = lig;
+			}
+			res.add(temp);
+		}
+		return res;
+	}
+	
+	public Board arrayToBoard(ArrayList<Integer> tab){
+		Board b = new Board(new Game(), this.size);
+		for(int i = 0; i < this.size; i++){
+			int temp = tab.get(i);
+			if(temp != -1){
+				boolean toto = b.placeQueen(i, temp);
+			}
+		}
+		return b;
+	}
+	
+	public boolean isSolutionArray(ArrayList<Integer> tab){
+		Board b = this.arrayToBoard(tab);
+		return b.isSolution();
+	}
+	
+	public ArrayList<Board> depthFirstSearchArray(ArrayList<Integer> tab){
+		ArrayList<Board> sol = new ArrayList<Board>();
+		Board b = this.arrayToBoard(tab);
+		try{
+			b.depthFirstSearch(b);
+		}catch(NoSuchElementException e){
+			//System.out.println("Echec");
+		}
+		throw new NoSuchElementException();	
+	}
+	
+	public ArrayList<Board> depthFirstSearchArray(){
+		ArrayList<Board> sol = new ArrayList<Board>();
+		ArrayList<Integer> tab = new ArrayList<Integer>();
+		for(int i = 0; i < this.size; i++){// on initialise le tableau avec que des cases vides
+			tab.add(-1);
+		}
+		try{
+			sol = depthFirstSearchArray(tab);
+			return sol;
+		}catch (NoSuchElementException e){
+			//System.out.println("Echec");
+		}
+		throw new NoSuchElementException();
 	}
 	
 	//------------TP3----------------------
