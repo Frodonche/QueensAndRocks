@@ -171,16 +171,19 @@ public class Main {
 			System.out.println("N'est pas solution");
 	}
 	
-	private static void test9(){
+	private static void test9(){ //Pas fonctionnel
 		ArrayList<Integer> tab = new ArrayList<Integer>();
-		tab.add(1); tab.add(3); tab.add(0); tab.add(2);
+		tab.add(-1);tab.add(-1);tab.add(-1);tab.add(-1);
 		System.out.println(tab.toString());
 		
 		System.out.println("Test 9 - Recherche profondeurArray + temps execution");
 		double debut = System.currentTimeMillis();
 	
-		//System.out.println(b.solutionSteps(b));
-		b.solutionSteps(b);
+		Board b = new Board(new Game(), tab.size());
+		Board bb = b.arrayToBoard(tab);
+		
+		String s = bb.solutionStepsArray(tab);
+		System.out.println(s);
 		
 		double fin = (System.currentTimeMillis() - debut)/1000;
 		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");

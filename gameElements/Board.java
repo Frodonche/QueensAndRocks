@@ -374,7 +374,8 @@ public class Board {
 		ArrayList<Board> sol = new ArrayList<Board>();
 		Board b = this.arrayToBoard(tab);
 		try{
-			b.depthFirstSearch(b);
+			sol = b.depthFirstSearch2(b);
+			return sol;
 		}catch(NoSuchElementException e){
 			//System.out.println("Echec");
 		}
@@ -383,17 +384,24 @@ public class Board {
 	
 	public ArrayList<Board> depthFirstSearchArray(){
 		ArrayList<Board> sol = new ArrayList<Board>();
-		ArrayList<Integer> tab = new ArrayList<Integer>();
-		for(int i = 0; i < this.size; i++){// on initialise le tableau avec que des cases vides
-			tab.add(-1);
-		}
+		Board b = new Board();
 		try{
-			sol = depthFirstSearchArray(tab);
+			sol = depthFirstSearchArray(b.boardToArray());
 			return sol;
 		}catch (NoSuchElementException e){
 			//System.out.println("Echec");
 		}
 		throw new NoSuchElementException();
+	}
+	
+	public String solutionStepsArray(ArrayList<Integer> b){
+		ArrayList<Board> temp = depthFirstSearchArray(b);
+		StringBuilder sB = new StringBuilder();
+		for(int i = temp.size()-1; i >= 0; i--){
+			sB.append(temp.get(i).toString());
+			sB.append("\n");
+		}
+		return sB.toString();
 	}
 	
 	//------------TP3----------------------
