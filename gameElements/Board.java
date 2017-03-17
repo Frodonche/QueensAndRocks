@@ -9,13 +9,24 @@ public class Board {
 	protected int size;
 	protected int numberOfPieces;
 	protected int numberOfQueens;
+	protected int numberOfQueens0, numberOfQueens1;
 	protected Square[][] board;
+	
+	protected int rockPlayer0;
+	protected int rockPlayer1;
+	
+	protected static int queenValue = 5;
+	protected static int rockValue = 2;
 	
 	public Board(Game game, int size){
 		this.game = game;
 		this.size = size;
+		this.rockPlayer0 = this.size;
+		this.rockPlayer1 = this.size;
 		this.numberOfPieces = 0;
 		this.numberOfQueens = 0;
+		this.numberOfQueens0 = 0;
+		this.numberOfQueens1 = 0;
 		board = new Square[size][size];
 		for (int i = 0; i < size; i++){
 			for (int j = 0; j < size; j++){
@@ -29,6 +40,8 @@ public class Board {
 	public Board(){
 		this.game = new Game();
 		this.size = 8;
+		this.rockPlayer0 = this.size;
+		this.rockPlayer1 = this.size;
 		this.numberOfPieces = 0;
 		board = new Square[size][size];
 		for (int i = 0; i < size; i++){
@@ -97,6 +110,8 @@ public class Board {
 	public Board clone(){
 		Board res = new Board(new Game(), this.size);
 		res.size = this.getSize();
+		res.rockPlayer0 = this.getRockPlayer0();
+		res.rockPlayer1 = this.getRockPlayer1();
 		for (int i = 0; i < this.size; i++){
 			for (int j = 0; j < this.size; j++){
 				res.setPiece(i, j, this.getPiece(i, j));
@@ -108,9 +123,6 @@ public class Board {
 	}
 	
 	public boolean isAccessible(int i, int j) {
-		boolean res = true;
-		
-		//diagonales qui vont à droite
 		int k = i;
 		int l = j;
 		while(k < size && l < size && k>-1 && l>-1){
@@ -213,17 +225,6 @@ public class Board {
 		}
 		return cpt;
 	}
-
-	/*public int numberOfQueens() {
-		int cpt = 0;
-		for(int i = 0; i < size; i++){
-			for(int j = 0; j < size; j++){
-				if(board[i][j] instanceof Queen)
-					cpt++;
-			}
-		}
-		return cpt;
-	}*/
 	
 	public int numberOfQueens(){
 		return this.numberOfQueens;
@@ -405,30 +406,208 @@ public class Board {
 	}
 	
 	//------------TP3----------------------
-	public boolean isAccessible2(int i, int j, Player currentPlayer) {
-		// TODO Auto-generated method stub
-		return false;
+	public void setRockPlayer0(int nb){
+		this.rockPlayer0 = nb;
+	}
+	
+	public void setRockPlayer1(int nb){
+		this.rockPlayer1 = nb;
+	}
+	
+	public int getRockPlayer0(){ return this.rockPlayer0; }
+	
+	public int getRockPlayer1(){ return this.rockPlayer1; }
+	
+	public boolean isAccessible2(int i, int j, Player currentPlayer) { // sale, on peut faire mieux, mais on verra peut etre plus tard
+		int k = i;
+		int l = j;
+		int numPlayer = currentPlayer.getNumber();
+		while(k < size && l < size && k>-1 && l>-1){ // diagonale en haut à droite
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer) //si on rencontre une reine et que c'est pas la notre
+				return false; // on peut pas placer de reine ici
+			
+			// si on rencontre un rocher ou une reine qui est la notre
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break; // on arrête cette direction et on va voir les autres
+			k++;
+			l++;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // diagonale en bas à gauche
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			k--;
+			l--;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // diagonale en bas à droite
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			k++;
+			l--;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // diagonale en haut à gauche
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			k--;
+			l++;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // verticale haut
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;	
+			l++;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // verticale bas
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			l--;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // horizontale droite
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			k++;
+		}
+		
+		k = i;
+		l = j;
+		while(k < size && l < size && k>-1 && l>-1){ // horizontale gauche
+			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer)
+				return false;
+			
+			if (this.board[k][l] instanceof Rock || (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() == numPlayer))
+				break;
+			k--;
+		}
+		
+		return true;
+		
+	}
+	
+	public String toStringAccess2(Player player){
+		StringBuilder sB = new StringBuilder();
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++){
+				if(this.isAccessible2(i, j, player))
+					sB.append("- ");
+				else
+					sB.append("X ");
+			}
+			sB.append("\n");
+		}
+		return sB.toString();
+	}
+	
+	public int numberOfAccessible2(Player player) {
+		int cpt = 0;
+		for(int i = 0; i < size; i++){
+			for(int j = 0; j < size; j++){
+				if(isAccessible2(i, j, player))
+					cpt++;
+			}
+		}
+		return cpt;
+	}
+	
+	public int numberOfRocks2(Player player){
+		return size - getNumberOfRocksLeft(player);
+	}
+	
+	public int numberOfQueens2(Player player){
+		int res = -1;
+		if(player.getNumber() == 0)
+			res = this.numberOfQueens0;
+		if(player.getNumber() == 1)
+			res = this.numberOfQueens1;
+		return res;
 	}
 	
 	
 	public boolean placeQueen2(int i, int j, Player player) {
-		// TODO Auto-generated method stub
+		if(isAccessible2(i, j, player)){
+			if(player.number == 0){
+				this.setPiece(i, j, new Queen(player));
+				this.numberOfQueens0++;
+			}
+			if(player.number == 1){
+				this.setPiece(i, j, new Queen(player));
+				this.numberOfQueens1++;
+			}
+			return true;
+		}
+			
 		return false;
 	}
-
-	public boolean placeRock2(int i, int j, Player player) {
-		// TODO Auto-generated method stub
+	
+	public boolean placeRock2(int lig, int col, Player player) {
+		int nombreRocks = getNumberOfRocksLeft(player);
+		
+		if(this.board[lig][col] instanceof Empty && nombreRocks > 0){ // si la case est libre et que le joueur a encore des rochers à poser
+			this.setPiece(lig, col, new Rock(player)); // on place le rocher
+			this.useRock(player); // on décompte un de notre réserve
+			return true;
+		}
 		return false;
 	}
 	
 	public int getNumberOfRocksLeft(Player player){
-		// TODO Auto-generated method stub
-		return 0;  
+		int res = 0;
+		if (player.getNumber() == 0){
+			res = getRockPlayer0();
+		}
+		if (player.getNumber() == 1){
+			res = getRockPlayer1();
+		}
+		return res;  
+	}
+	
+	public void useRock(Player player){
+		int temp;
+		if(player.getNumber() == 0){
+			temp = getRockPlayer0() -1;
+			setRockPlayer0(temp);
+		}
+		if(player.getNumber() == 1){
+			temp = getRockPlayer1() -1;
+			setRockPlayer1(temp);
+		}
 	}
 	
 	public int getScore(Player player){
-		// TODO Auto-generated method stub
-		return 0;
+		return (numberOfRocks2(player)*rockValue) + (numberOfQueens2(player)*queenValue);
 	}
 
 

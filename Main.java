@@ -22,7 +22,10 @@ public class Main {
 		//test6();
 		//test7();
 		//test8();
-		test9();
+		//test9();
+		//test10();
+		//test11();
+		test12();
 		
 		//testGUI();
 		
@@ -171,7 +174,7 @@ public class Main {
 			System.out.println("N'est pas solution");
 	}
 	
-	private static void test9(){ //Pas fonctionnel
+	private static void test9(){
 		ArrayList<Integer> tab = new ArrayList<Integer>();
 		tab.add(-1);tab.add(-1);tab.add(-1);tab.add(-1);
 		System.out.println(tab.toString());
@@ -187,5 +190,70 @@ public class Main {
 		
 		double fin = (System.currentTimeMillis() - debut)/1000;
 		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
+	}
+	
+	private static void test10(){
+		System.out.println("Test 10 - Test getNbrRochers");
+		Game g = new Game();
+		Board b = new Board(g, 9);
+		int nbRocks0 = b.getNumberOfRocksLeft(g.getPlayer0());
+		int nbRocks1 = b.getNumberOfRocksLeft(g.getPlayer1());
+		System.out.println("Nombre de rocks player0 : "+nbRocks0);
+		System.out.println("Nombre de rocks player1 : "+nbRocks1);
+		
+		System.out.println("\nOn utilise un rocher chez player 1");
+		b.useRock(g.getPlayer1());
+		
+		nbRocks0 = b.getNumberOfRocksLeft(g.getPlayer0());
+		nbRocks1 = b.getNumberOfRocksLeft(g.getPlayer1());
+		System.out.println("Nombre de rocks player0 : "+nbRocks0);
+		System.out.println("Nombre de rocks player1 : "+nbRocks1);
+	}
+	
+	private static void test11(){
+		System.out.println("Test 11 - IsAccessible2, toStringAccess2, numberOfAccessible2, placeRock2, placeQueen2");
+		Game g = new Game();
+		Board b = new Board(g, 9);
+		
+		System.out.println("isAccessible player 0");
+		System.out.println(b.toStringAccess2(g.getPlayer0()));
+		
+		System.out.println("isAccessible player 1");
+		System.out.println(b.toStringAccess2(g.getPlayer1()));
+		
+		System.out.println("On place un reine qui appartient à player0 (par defaut dans board)");
+		b.placeQueen(4, 5);
+		
+		System.out.println("isAccessible player 0");
+		System.out.println(b.toStringAccess2(g.getPlayer0()));
+		
+		System.out.println("isAccessible player 1");
+		System.out.println(b.toStringAccess2(g.getPlayer1()));
+	}
+	
+	private static void test12(){ // pas terminé, mais la boucle est là
+		System.out.println("Test 12 - Jeu à 2 joueurs correspondant à la question 9 du TP3");
+		Game g = new Game();
+		Board b = new Board(g, 5);
+		int currentPlayer = 0; // le joueur 0 commencera la partie
+		int mov = 0; // un petit compteur de mouvements
+		boolean enJeu = true;
+		
+		while(enJeu){
+			System.out.print("Mouvements : "+mov);
+			System.out.println("Au tour du joueur "+currentPlayer);
+			System.out.println(b.toString());
+			
+			ArrayList<String> choixA = new ArrayList<String>();
+			choixA.add("Queen");
+			choixA.add("Rock");
+			choixA.add("Quitter");
+			Object[] choix = choixA.toArray();
+			
+			Object input = JOptionPane.showInputDialog(null, "Choose one", "Input", JOptionPane.INFORMATION_MESSAGE, null, choix, choix[0]);
+			if(input != null)
+				if(input.toString() == "Quitter")
+					enJeu = !enJeu;
+		}
 	}
 }
