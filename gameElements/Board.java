@@ -561,12 +561,14 @@ public class Board {
 			if(player.number == 0){
 				this.setPiece(i, j, new Queen(player));
 				this.numberOfQueens0++;
+				return true;
 			}
 			if(player.number == 1){
 				this.setPiece(i, j, new Queen(player));
 				this.numberOfQueens1++;
+				return true;
 			}
-			return true;
+
 		}
 			
 		return false;
@@ -577,7 +579,7 @@ public class Board {
 		
 		if(this.board[lig][col] instanceof Empty && nombreRocks > 0){ // si la case est libre et que le joueur a encore des rochers à poser
 			this.setPiece(lig, col, new Rock(player)); // on place le rocher
-			this.useRock(player); // on décompte un de notre réserve
+			this.useRock(player); // on decompte un de notre reserve
 			return true;
 		}
 		return false;
