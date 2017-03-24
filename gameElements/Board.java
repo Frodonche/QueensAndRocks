@@ -363,7 +363,7 @@ public class Board {
 				boolean toto = b.placeQueen(i, temp);
 			}
 		}
-		return b;
+		return b;// on utilise que useRock et pas placeRock, histoire de ne pas avoir de "sécurité" nous empêchant
 	}
 	
 	public boolean isSolutionArray(ArrayList<Integer> tab){
@@ -616,23 +616,114 @@ public class Board {
 
 	//----------------------TP4&5--------------------------
 	public boolean isFinal() {
-		// TODO Auto-generated method stub
-		return false;
+		Board clone = this.clone(); // on utilise un clone pour pas modifier ce board
+		Boolean reineJ0 = (numberOfAccessible2(game.getPlayer0()) != 0); // on teste si le joueur0 peut encore poser des reines
+		Boolean reineJ1 = (numberOfAccessible2(game.getPlayer1()) != 0); // on teste si le joueur1 peut encore poser des reines
+		
+		// on teste si le joueur a encore des rock à poser et si il reste encore de la place pour poser un rock (indiff pour j0 ou j1)
+		Boolean rockJ0 = (getNumberOfRocksLeft(game.getPlayer0()) > 0) && atLeastAPlaceForARock();
+		Boolean rockJ1 = (getNumberOfRocksLeft(game.getPlayer1()) > 0) && atLeastAPlaceForARock(); 		
+		
+		// si un des joueurs ne peut plus poser ni une reine, ni un rocher
+		if(((reineJ0 || rockJ0) && (reineJ1 || rockJ1)) == false){
+			return true; // c'est final
+		}else{
+			return false; // sinon non
+		}
 	}
-
+	
+	public boolean isRockAccessible(int lig, int col){
+		return (this.board[lig][col] instanceof Empty); // on peut poser un rocher du moment que la case en question est vide
+	}
+	
+	public boolean atLeastAPlaceForARock(){ // nous dit si on peut encore poser au moins un rocher (= si il reste au moins une case vide)
+		int lig = 0, col = 0;
+		boolean trouve = false;
+		while(lig < size && trouve == false){
+			while(col < size && trouve == false){
+				if(isRockAccessible(lig, col)) // si on a trouve une case vide
+					trouve = true; // on casse les boucles et on retourne (trouve == true)
+				col ++;
+			}
+			lig ++;
+		}
+		return trouve;
+	}
+	
+	public ArrayList<Board> getSuccessors2(Player player){
+		ArrayList<Board> listeSucc = new ArrayList<Board>();
+		for(int ligne = 0; ligne < this.size; ligne ++){
+			Board b = this.clone();
+			if(b.placeQueen2(numberOfQueens(), ligne, player))
+				listeSucc.add(b);
+		}		
+		return listeSucc;
+	}
+	
+	
 	public Board minimax(Board b, Player currentPlayer, int minimaxDepth, Eval evaluation) {
-		// TODO Auto-generated method stub
-		return null;
+		ArrayList<Board> sol = new ArrayList<Board>(); // S : ensemble d'états
+		float score, scoreMax;
+		
+		sol = b.getSuccessors2(currentPlayer); // S <- Successeurs(e)
+		scoreMax = Float.NEGATIVE_INFINITY;
+		Board eSortie = pasDeCoupPossible(b); // on associe à cet état une situation abérante à détecter plus tard
+		
+		for(Board s : sol){ // pour s appartenant à S faire
+			score = evaluation(currentPlayer, minimaxDepth, s); // score <- evaluation(c,s)
+			if(score > scoreMax){
+				eSortie = s;
+				scoreMax = score;
+			}
+		}		
+		return eSortie;
 	}
 	
+	// ici, la situation abérante sera que le Joueur0 aura un nombre de rochers à poser négatif
+	public Board pasDeCoupPossible(Board b){
+		Board res = b.clone();
+		for(int i = 0; i < size+1; i++){ // on met size + 1 histoire d'etre sur de dépasser le nombre de rochers disponibles
+			// on utilise que useRock et pas placeRock, histoire de ne pas avoir de "sécurité" nous empêchant de faire décroitre le nombre de rock dispos
+			res.useRock(res.getGame().getPlayer0()); 
+		}
+		return res;
+	}
+
 	
-	
-
-
-
-
-
-	
+	public float evaluation(Player player, int minimaxDepth, Board e){
+		ArrayList<Board> sol = new ArrayList<Board>(); // S : ensemble d'états 
+		Player playing;
+		if(minimaxDepth % 2 == 0){ // si c est pair
+			playing = e.getGame().getPlayer0(); // c'est au tour du joueur0 puisque c'est lui qui commence
+		}else{ // si c est impair
+			playing = e.getGame().getPlayer1();
+		}
+		float score, scoreMax, scoreMin;
+		
+		if(e.isFinal()){ //si e est un etat final (de fin de partie)
+			return 0; // retourner +infini, -infini ou 0 selon que la partie soit perdue par la machine, gagnée par elle, ou nulle
+			// on doit utiliser la comparaison des scores pour définir qui a gagné
+		}
+		if(minimaxDepth == 0){ // si c == 0 alors
+			return new Eval0().getEval(player, e);
+		}
+		sol = e.getSuccessors2(playing); // S <- successeurs(e)
+		if(player.getNumber() == playing.getNumber()){ // si c'est au joueur passé en arguement de jouer
+			scoreMax = Float.NEGATIVE_INFINITY;
+			for(Board s : sol){ // pour s appartenant à S faire
+				scoreMax = max(scoreMax, evaluation(playing, minimaxDepth-1, s));
+				return scoreMax;
+			}
+		}else{
+			scoreMin = Float.POSITIVE_INFINITY;
+			for(Board s : sol){ // pour s appartenant à S faire
+				scoreMax = min(scoreMax, evaluation(playing, minimaxDepth-1, s));
+				return scoreMin;
+			}
+		}
+		
+		return 0;
+	}
 	
 
 }

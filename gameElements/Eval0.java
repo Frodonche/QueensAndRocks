@@ -8,8 +8,14 @@ public class Eval0 implements Eval{
 	
 	@Override
 	public float getEval(Player player, Board b) {
-		// TODO Auto-generated method stub
-		return 0;
+		int res = 0;
+		if(player.getNumber() == 0){ // si on a passé le joueur0 en paramètre
+			res = b.getScore(player) - b.getScore(b.getGame().getPlayer1()); // res = scoreJoueur0 - scoreJoueur1
+		}
+		if(player.getNumber() == 1){ // si on a passé le joueur1 en paramètre
+			res = b.getScore(player) - b.getScore(b.getGame().getPlayer0()); // res = scoreJoueur1 - scoreJoueur0
+		}
+		return res;
 	}
 
 }
