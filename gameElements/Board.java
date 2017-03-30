@@ -422,6 +422,9 @@ public class Board {
 		int k = i;
 		int l = j;
 		int numPlayer = currentPlayer.getNumber();
+		if(this.board[k][l] instanceof Queen || this.board[k][l] instanceof Rock) // si on tombe sur une case déjà occupée
+			return false;
+		
 		while(k < size && l < size && k>-1 && l>-1){ // diagonale en haut à droite
 			if (this.board[k][l] instanceof Queen && this.board[k][l].getPlayer().getNumber() != numPlayer) //si on rencontre une reine et que c'est pas la notre
 				return false; // on peut pas placer de reine ici
@@ -558,17 +561,14 @@ public class Board {
 	
 	public boolean placeQueen2(int i, int j, Player player) {
 		if(isAccessible2(i, j, player)){
+			this.setPiece(i, j, new Queen(player));
 			if(player.number == 0){
-				this.setPiece(i, j, new Queen(player));
 				this.numberOfQueens0++;
-				return true;
 			}
 			if(player.number == 1){
-				this.setPiece(i, j, new Queen(player));
 				this.numberOfQueens1++;
-				return true;
 			}
-
+			return true;
 		}
 			
 		return false;
@@ -648,7 +648,7 @@ public class Board {
 			else
 				return false;
 		}
-		return false; // le return par defaut, jamais retourn� normalement
+		return false; // le return par defaut, jamais retourn� normalement
 	}
 	
 	public boolean isRockAccessible(int lig, int col){
@@ -671,10 +671,14 @@ public class Board {
 	
 	public ArrayList<Board> getSuccessors2(Player player){
 		ArrayList<Board> listeSucc = new ArrayList<Board>();
+		int col = 0;
 		for(int ligne = 0; ligne < this.size; ligne ++){
 			Board b = this.clone();
-			if(b.placeQueen2(numberOfQueens(), ligne, player))
+			if(b.placeRock2(ligne, col, player))
 				listeSucc.add(b);
+			else if(b.placeQueen2(numberOfQueens(), ligne, player))
+				listeSucc.add(b);
+			col++;
 		}		
 		return listeSucc;
 	}

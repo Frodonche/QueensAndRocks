@@ -4,6 +4,8 @@ import java.util.Date;
 import javax.swing.JOptionPane;
 
 import gameElements.Board;
+import gameElements.Eval0;
+import gameElements.EvalLambda;
 import gameElements.Game;
 import gameElements.Player;
 import gameElements.Queen;
@@ -25,7 +27,9 @@ public class Main {
 		//test9();
 		//test10();
 		//test11();
-		test12();
+		//test12();
+		//test13();
+		test14();
 		
 		//testGUI();
 		
@@ -190,6 +194,7 @@ public class Main {
 		
 		double fin = (System.currentTimeMillis() - debut)/1000;
 		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
+	
 	}
 	
 	private static void test10(){
@@ -231,7 +236,7 @@ public class Main {
 		System.out.println(b.toStringAccess2(g.getPlayer1()));
 	}
 	
-	private static void test12(){ // pas termine, mais la boucle est la
+	private static void test12(){
 		System.out.println("Test 12 - Jeu a 2 joueurs correspondant a la question 9 du TP3");
 		Game g = new Game();
 		Board b = new Board(g, 5);
@@ -247,9 +252,8 @@ public class Main {
 		choixA.add("Rock");
 		choixA.add("Quitter");
 		Object[] choix = choixA.toArray();
-		boolean ok;
 		
-		// celui pour les coordonnées
+		// celui pour les coordonnï¿½es
 		ArrayList<Integer> choixC = new ArrayList<Integer>();
 		for(int i = 0; i < b.getSize(); i++){
 			choixC.add(i);
@@ -302,33 +306,148 @@ public class Main {
 					}
 				}
 			}else{
-				System.out.println("Action non sélectionnee");
+				System.out.println("Action non sï¿½lectionnee");
 			}
 			
 			
 		}
 	}
+	
+	private static void test13(){ // IA Ã  revoir, faute Ã  minimax / eval pas tout Ã  fait fonctionnel
+		System.out.println("Test 13 - Jeu joueur contre machine correspondant Ã  la question 6 du TP4");
+		Game g = new Game();
+		Board b = new Board(g, 5);
+		int currentPlayer = 0; // le joueur 0 commencera la partie
+		int mov = 0; // un petit compteur de mouvements
+		boolean enJeu = true;
+		int lig = -1, col = -1;
+		Eval0 evaluation = new Eval0();
+		
+		// initialisation des tableaux pour les JOptionPane
+		// celui pour reine / rocher
+		ArrayList<String> choixA = new ArrayList<String>();
+		choixA.add("Queen");
+		choixA.add("Rock");
+		choixA.add("Quitter");
+		Object[] choix = choixA.toArray();
+		
+		// celui pour les coordonnï¿½es
+		ArrayList<Integer> choixC = new ArrayList<Integer>();
+		for(int i = 0; i < b.getSize(); i++){
+			choixC.add(i);
+		}
+		Object[] choix2 = choixC.toArray();
+		
+		while(enJeu){
+			
+			if(currentPlayer == 0){		
+				System.out.print("Mouvements : "+mov);
+				System.out.println(" - Au tour du joueur "+currentPlayer);
+				System.out.println(b.toString());
+				
+				Object input = JOptionPane.showInputDialog(null, "Choisissez quoi poser", "Choix de l'action", JOptionPane.INFORMATION_MESSAGE, null, choix, choix[0]);
+				if(input != null){
+					if(input.toString() == "Quitter")
+						enJeu = !enJeu;
+					else{
+						Object input2 = JOptionPane.showInputDialog(null, "Choisissez une colonne", "Choix de la colonne", JOptionPane.INFORMATION_MESSAGE, null, choix2, choix2[0]);
+						Object input3 = JOptionPane.showInputDialog(null, "Choisissez une ligne", "Choix de la ligne", JOptionPane.INFORMATION_MESSAGE, null, choix2, choix2[0]);
+	
+						if(input2 != null && input3 != null){
+							col = Integer.valueOf(input2.toString());
+							lig = Integer.valueOf(input3.toString());
+							
+							if(currentPlayer == 0){
+								if(input.toString() == "Queen"){
+									b.placeQueen2(col, lig, g.getPlayer0());
+									// si on a choisi un mauvais emplacement, tant pis pour nous, tour suivant !
+								}
+								if(input.toString() == "Rock"){
+									b.placeRock2(col, lig, g.getPlayer0());
+									// si on a choisi un mauvais emplacement, tant pis pour nous, tour suivant !
+								}
+								currentPlayer = 1;
+							}	
+							mov ++;
+							
+						}
+						else{
+							System.out.println("Coordonnees non selectionnes");
+						}
+					}
+				}else{
+					System.out.println("Action non sï¿½lectionnee");
+				}
+			}else if(currentPlayer == 1){ // si c'est la machine qui doit jouer
+				b = b.minimax(b, g.getPlayer1(), 2, evaluation);
+				currentPlayer = 0;
+			}
+			
+		}
+	}
+	
+	public static void test14(){ // boucle infinie (condition de victoire manquante) + IA Ã  revoir (comme test 13)
+		double debut = System.currentTimeMillis();	
+		
+		System.out.println("Test 13 - Jeu machine contre machine correspondant Ã  la question 6 du TP4");
+		Game g = new Game();
+		Board b = new Board(g, 5);
+		int currentPlayer = 0; // le joueur 0 commencera la partie
+		int mov = 0; // un petit compteur de mouvements
+		boolean enJeu = true;
+		Eval0 evaluation = new Eval0();
+		
+		while(enJeu){
+			System.out.print("Mouvements : "+mov);
+			System.out.println(" - Au tour du joueur "+currentPlayer);
+			System.out.println(b.toString());
+			
+			if(currentPlayer == 0){
+				b = b.minimax(b, g.getPlayer0(), 2, evaluation);
+				currentPlayer = 1;
+			}else if(currentPlayer == 1){ 
+				b = b.minimax(b, g.getPlayer1(), 2, evaluation);
+				currentPlayer = 0;
+			}
+		}
+		
+		double fin = (System.currentTimeMillis() - debut)/1000;
+		System.out.println("Temps execution de depthFirstSearch : "+fin+"s");
+	}
+	
+	public static void optimisation(){
+		Game g = new Game();
+		Board b = new Board(g, 5);
+		EvalLambda eL = new EvalLambda();
+		float lambda = eL.getLambda();
+		float lambdaprime = lambda + (float)0.1;
+	}
 }
 
 /* Reponse aux questions de la partie 2 du TP3
  * 
- * 1) Dans ces cas, le premier joueur à poser une reine a forcément gagné.
- * Le role du premier joueur determine forcément le vaincqueur (cf ci dessus)
- * Car si on force le premier joueur à poser un rocher, le deuxième va forcément poser une reine et gagner
+ * 1) Dans ces cas, le premier joueur ï¿½ poser une reine a forcï¿½ment gagnï¿½.
+ * Le role du premier joueur determine forcï¿½ment le vaincqueur (cf ci dessus)
+ * Car si on force le premier joueur ï¿½ poser un rocher, le deuxiï¿½me va forcï¿½ment poser une reine et gagner
  * 
- * 2) Elle semble juste dans le sens où elle permet d'équilibrer un peu le jeu en empêchant le premier joueur de
- * prendre l'avantage en posant une reine à un endroit trop strategique, mais en l'autorisant tout de même à gêner
+ * 2) Elle semble juste dans le sens oï¿½ elle permet d'ï¿½quilibrer un peu le jeu en empï¿½chant le premier joueur de
+ * prendre l'avantage en posant une reine ï¿½ un endroit trop strategique, mais en l'autorisant tout de mï¿½me ï¿½ gï¿½ner
  * ce genre de manoeuvre pour le joueur 2 en posant un rocher. Cela pourra peut etre influer sur les points. A voir...
  * 
  * 3) Oui, les symetries sont importantes ici. En effet, sur un plateau de taille impaire, le centre est symbolise par une
  * case, contrairement a un tableau de taille paire.
  * 
- * 4)5) Selon moi, poser un rocher ou une reine ne devrait pas etre sujet a une différenciation de points. En effet, la stratégie
+ * 4)5) Selon moi, poser un rocher ou une reine ne devrait pas etre sujet a une diffï¿½renciation de points. En effet, la stratï¿½gie
  * de jeu la plus efficace est de poser des reines pour prendre le controle du plateau, temporiser egalement en posant des rochers
- * pour ne pas que l'adversaire aie beaucoup de rochers à poser alors qu'il ne nous reste plus de reine. Cela conduirait l'adversaire
+ * pour ne pas que l'adversaire aie beaucoup de rochers ï¿½ poser alors qu'il ne nous reste plus de reine. Cela conduirait l'adversaire
  * a neutraliser la plupart du controle qui nous est octroye sur le plateau par nos reines.
  * 
- * 6) Les cases définitivement perdues sont celles directement adjacentes à une reine adverse. En effet, celles-ci sont soit sujettes à
- * l'action d'une reine, soit occupées par un rocher pour neutraliser l'action de la dite reine sur la ligne en question. Toutes les autres
- * sont potentiellement récupérables.
+ * 6) Les cases dï¿½finitivement perdues sont celles directement adjacentes ï¿½ une reine adverse. En effet, celles-ci sont soit sujettes ï¿½
+ * l'action d'une reine, soit occupï¿½es par un rocher pour neutraliser l'action de la dite reine sur la ligne en question. Toutes les autres
+ * sont potentiellement rï¿½cupï¿½rables.
+ * 
+ * 
+ * Reponse aux questions de la partie 3 du TP 4
+ * 
+ * le cas nÂ°2 (avec QueenValue > RockValue (avec diffÃ©rence serrÃ©e) semble le plus appropriÃ©
 */
