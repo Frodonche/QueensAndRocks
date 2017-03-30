@@ -616,7 +616,6 @@ public class Board {
 
 	//----------------------TP4&5--------------------------
 	public boolean isFinal() {
-		Board clone = this.clone(); // on utilise un clone pour pas modifier ce board
 		Boolean reineJ0 = (numberOfAccessible2(game.getPlayer0()) != 0); // on teste si le joueur0 peut encore poser des reines
 		Boolean reineJ1 = (numberOfAccessible2(game.getPlayer1()) != 0); // on teste si le joueur1 peut encore poser des reines
 		
@@ -630,6 +629,26 @@ public class Board {
 		}else{
 			return false; // sinon non
 		}
+	}
+	
+	public boolean aPerdu(Player player){
+		if(player.getNumber() == 0){
+			Boolean reineJ0 = (numberOfAccessible2(game.getPlayer0()) != 0); // on teste si le joueur0 peut encore poser des reines
+			Boolean rockJ0 = (getNumberOfRocksLeft(game.getPlayer0()) > 0) && atLeastAPlaceForARock();
+			if((reineJ0 || rockJ0) == false)
+				return true;
+			else
+				return false;
+		}
+		if(player.getNumber() == 1){
+			Boolean reineJ1 = (numberOfAccessible2(game.getPlayer1()) != 0); // on teste si le joueur1 peut encore poser des reines
+			Boolean rockJ1 = (getNumberOfRocksLeft(game.getPlayer1()) > 0) && atLeastAPlaceForARock();
+			if((reineJ1 || rockJ1) == false)
+				return true;
+			else
+				return false;
+		}
+		return false; // le return par defaut, jamais retourn� normalement
 	}
 	
 	public boolean isRockAccessible(int lig, int col){
@@ -692,17 +711,24 @@ public class Board {
 	
 	public float evaluation(Player player, int minimaxDepth, Board e){
 		ArrayList<Board> sol = new ArrayList<Board>(); // S : ensemble d'états 
-		Player playing;
+		Player playing, machine;
 		if(minimaxDepth % 2 == 0){ // si c est pair
 			playing = e.getGame().getPlayer0(); // c'est au tour du joueur0 puisque c'est lui qui commence
+			machine = e.getGame().getPlayer1();
 		}else{ // si c est impair
 			playing = e.getGame().getPlayer1();
+			machine = e.getGame().getPlayer0();
 		}
 		float score, scoreMax, scoreMin;
 		
 		if(e.isFinal()){ //si e est un etat final (de fin de partie)
-			return 0; // retourner +infini, -infini ou 0 selon que la partie soit perdue par la machine, gagnée par elle, ou nulle
-			// on doit utiliser la comparaison des scores pour définir qui a gagné
+			if(e.aPerdu(playing) && e.aPerdu(machine)){
+				return 0;
+			}else if(e.aPerdu(playing)){
+				return Float.NEGATIVE_INFINITY;
+			}else if(e.aPerdu(machine)){
+				return Float.POSITIVE_INFINITY;
+			}
 		}
 		if(minimaxDepth == 0){ // si c == 0 alors
 			return new Eval0().getEval(player, e);
@@ -717,13 +743,25 @@ public class Board {
 		}else{
 			scoreMin = Float.POSITIVE_INFINITY;
 			for(Board s : sol){ // pour s appartenant à S faire
-				scoreMax = min(scoreMax, evaluation(playing, minimaxDepth-1, s));
+				scoreMin = min(scoreMin, evaluation(playing, minimaxDepth-1, s));
 				return scoreMin;
 			}
 		}
-		
-		return 0;
+		return 0; // return par defaut, normalement jamais atteint
 	}
 	
+	protected float max(float i, float j){
+		if(i>j)
+			return i;
+		else
+			return j;
+	}
+	
+	protected float min(float i, float j){
+		if(i>j)
+			return j;
+		else
+			return i;
+	}
 
 }
